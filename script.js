@@ -1,10 +1,15 @@
 const obtenerPalabraUrl = 'https://words.dev-apis.com/word-of-the-day'; 
 const validarPalabraUrl = 'https://words.dev-apis.com/validate-word';
+
 const letras = document.querySelectorAll('.letra');
 const palabras = document.querySelectorAll('.palabra');
-const palabrasArray = [[],[],[],[],[],[]]
-let palabraActual = ''
 
+const palabrasArray = [[],[],[],[],[],[]]
+let palabraDelDia = [];   
+let palabraActual = ''
+let posicionPalabra = 0;
+
+console.log(palabraDelDia); 
 
 
 // Solicitudes a la API
@@ -30,9 +35,9 @@ async function validarPalabra(palabra) {
     return data.validWord;
 }
 
-obtenerPalabra().then(palabra => {
-    console.log(palabra);
-});
+
+
+obtenerPalabra().then((palabra) => palabra.split(''));
 
 validarPalabra('idiot').then((valid) => {
     console.log('La palabra es válida:', valid);
@@ -86,28 +91,47 @@ function borrarUltimo() {
     if (palabraActual.length === 0) {
         return;
     }
-    // Busca el último div con contenido
-    const ultimoDiv = Array.from(letras).reverse().find(div => div.textContent);
-    // Si hay un div con contenido, lo borra
+
+    // Obtiene el último carácter de la palabra actual
+    const ultimoCaracter = palabraActual.charAt(palabraActual.length - 1);
+
+    // Busca el último div donde se escribió ese carácter
+    const ultimoDiv = Array.from(letras).reverse().find(div => div.textContent === ultimoCaracter);
+
+    // Si hay un div con el último carácter, lo borra
     if (ultimoDiv) {
-        const ultimaPosicion = palabraActual.lastIndexOf(ultimoDiv.textContent);
+        ultimoDiv.textContent = '';
+
+        // Actualiza la palabra actual eliminando el último carácter
+        palabraActual = palabraActual.slice(0, -1);
     }
 }
 
-function actualizarPalabra() {
-    // Actualiza cada div de letra con el contenido correspondiente de la palabraActual
-    letras.forEach((letra, index) => {   
-        letra.textContent = palabraActual[index] || ''; // Asigna la letra correspondiente o cadena vacía si no hay letra
+
+function actualizarPalabra(palabra, posicion) {
+    // Verifica que la palabra tenga exactamente 5 letras
+    if (palabra.length < 5) {
+        return;
+    }
+
+    // Actualiza solo las letras dentro del div#palabra correspondiente
+    const letrasPalabra = document.querySelectorAll(`#palabra-${posicion} .letra`);
+    letrasPalabra.forEach((letra, index) => {
+        letra.textContent = palabra[index] || ''; // Asigna la letra correspondiente o cadena vacía si no hay letra
     });
 }
-
 
 document.addEventListener('keyup', (event) => {
     escribirLetra(event);
     if (event.key === 'Enter') {
         if (verificarPalabra(palabraActual)) {
             guardarPalabra();
+            // Llama a la función actualizarPalabra con la palabraActual y la posición del div#palabra actual
+            actualizarPalabra(palabraActual, posicionPalabra);
             palabraActual = '';
+
+            // Encuentra la próxima posición vacía en palabrasArray
+            posicionPalabra = palabrasArray.findIndex(subarray => subarray.length === 0);
         }
     }
     
