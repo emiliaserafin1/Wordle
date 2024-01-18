@@ -1,7 +1,8 @@
 const obtenerPalabraUrl = 'https://words.dev-apis.com/word-of-the-day'; 
 const validarPalabraUrl = 'https://words.dev-apis.com/validate-word';
 const letras = document.querySelectorAll('.letra');
-const palabras = [[],[],[],[],[],[]]
+const palabras = document.querySelectorAll('.palabra');
+const palabrasArray = [[],[],[],[],[],[]]
 let palabraActual = ''
 
 
@@ -60,12 +61,19 @@ function escribirLetra(letra) {
             primerDivVacio.textContent = letraPresionada;
             palabraActual += letra.key.toUpperCase();
         }
-
-        // Si ya llego a 5 letras, guarda la palabra
-        if (palabraActual.length === 5){
-            palabras.push(palabraActual);
-        }
     } 
+}
+
+function guardarPalabra(){
+    // Si ya llegó a 5 letras, guarda la palabra en el array correspondiente
+    if (palabraActual.length === 5){
+        const index = palabrasArray.findIndex(subarray => subarray.length === 0);
+        console.log(index);
+        if (index !== -1) {
+            palabrasArray[index] = [...palabraActual];
+        }
+        console.log(palabrasArray);
+    }
 }
 
 function verificarPalabra(palabra) {
@@ -82,13 +90,7 @@ function borrarUltimo() {
     const ultimoDiv = Array.from(letras).reverse().find(div => div.textContent);
     // Si hay un div con contenido, lo borra
     if (ultimoDiv) {
-        console.log(ultimoDiv.textContent);
-        console.log(palabraActual);
         const ultimaPosicion = palabraActual.lastIndexOf(ultimoDiv.textContent);
-        console.log(ultimaPosicion);
-        palabraActual = palabraActual.substring(0, ultimaPosicion) ;
-        console.log(`Palabra actual: ${palabraActual}`)
-        actualizarPalabra();
     }
 }
 
@@ -104,7 +106,7 @@ document.addEventListener('keyup', (event) => {
     escribirLetra(event);
     if (event.key === 'Enter') {
         if (verificarPalabra(palabraActual)) {
-            console.log(palabras);
+            guardarPalabra();
             palabraActual = '';
         }
     }
