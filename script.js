@@ -1,7 +1,7 @@
 const obtenerPalabraUrl = 'https://words.dev-apis.com/word-of-the-day'; 
 const validarPalabraUrl = 'https://words.dev-apis.com/validate-word';
 const letras = document.querySelectorAll('.letra');
-const palabras = []
+const palabras = [[],[],[],[],[],[]]
 let palabraActual = ''
 
 
@@ -87,6 +87,7 @@ function borrarUltimo() {
         const ultimaPosicion = palabraActual.lastIndexOf(ultimoDiv.textContent);
         console.log(ultimaPosicion);
         palabraActual = palabraActual.substring(0, ultimaPosicion) ;
+        console.log(`Palabra actual: ${palabraActual}`)
         actualizarPalabra();
     }
 }
