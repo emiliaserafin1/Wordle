@@ -4,12 +4,11 @@ const validarPalabraUrl = 'https://words.dev-apis.com/validate-word';
 const letras = document.querySelectorAll('.letra');
 const palabras = document.querySelectorAll('.palabra');
 
-const palabrasArray = [[],[],[],[],[],[]]
-let palabraDelDia = [];   
+const palabrasArray = [[],[],[],[],[],[]] 
+let palabraDelDia = '';
 let palabraActual = ''
 let posicionPalabra = 0;
-
-console.log(palabraDelDia); 
+let ganaste = false;
 
 
 // Solicitudes a la API
@@ -34,15 +33,7 @@ async function validarPalabra(palabra) {
     const data = await promise.json();
     return data.validWord;
 }
-
-
-
-obtenerPalabra().then((palabra) => palabra.split(''));
-
-validarPalabra('idiot').then((valid) => {
-    console.log('La palabra es válida:', valid);
-})
-    
+   
 
 function isLetter(letter) {
     return /^[a-zA-Z]$/.test(letter);
@@ -52,8 +43,8 @@ function escribirLetra(letra) {
     // Obtiene la tecla presionada
     const letraPresionada = letra.key.toUpperCase();
 
-    // Si no es una letra, no hace nada
-    if (!isLetter(letraPresionada)) {
+    // Si no es una letra o ya gano, no hace nada
+    if (!isLetter(letraPresionada) || ganaste) {
         return;
     }
 
@@ -81,11 +72,44 @@ function guardarPalabra(){
     }
 }
 
-function verificarPalabra(palabra) {
+function resetearPalabraActual() {
+    palabraActual = '';
+}
+
+function verificarLongitud(palabra) {
     if (palabra.length === 5){
         return true;
     }
 }
+
+function checkearPalabra(palabra, posicion) {
+    obtenerPalabra().then((palabraDelDia) => { 
+        palabraDelDia = palabraDelDia.toUpperCase();
+        let palabraDelDiaAux = palabraDelDia;
+        const letrasPalabra = document.querySelectorAll(`#palabra-${posicion} .letra`);
+
+        if (palabra === palabraDelDia) {
+            ganaste = true;
+            alert('Ganaste!');
+            for (let i = 0; i < palabra.length; i++) {
+                letrasPalabra[i].classList.add('acierto');
+            }
+        } 
+        for (let i = 0; i < palabra.length; i++) {
+            console.log('Letra ingresada ' + palabra[i], 'Letra correcta ' + palabraDelDia[i])
+            if (palabra[i] === palabraDelDia[i]) {
+                letrasPalabra[i].classList.add('acierto');
+                palabraDelDiaAux -= palabra[i];
+                console.log('acierto');
+            } else if (palabraDelDiaAux.includes(palabra[i])){
+                letrasPalabra[i].classList.add('casiAcierto');
+            } else {
+                letrasPalabra[i].classList.add('fallo');
+            }
+        }
+    });
+}
+
 
 function borrarUltimo() {
     if (palabraActual.length === 0) {
@@ -124,12 +148,12 @@ function actualizarPalabra(palabra, posicion) {
 document.addEventListener('keyup', (event) => {
     escribirLetra(event);
     if (event.key === 'Enter') {
-        if (verificarPalabra(palabraActual)) {
+        if (verificarLongitud(palabraActual)) {
+            checkearPalabra(palabraActual, posicionPalabra);
             guardarPalabra();
             // Llama a la función actualizarPalabra con la palabraActual y la posición del div#palabra actual
             actualizarPalabra(palabraActual, posicionPalabra);
-            palabraActual = '';
-
+            resetearPalabraActual();
             // Encuentra la próxima posición vacía en palabrasArray
             posicionPalabra = palabrasArray.findIndex(subarray => subarray.length === 0);
         }
