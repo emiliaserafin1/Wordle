@@ -83,32 +83,38 @@ function verificarLongitud(palabra) {
 }
 
 function checkearPalabra(palabra, posicion) {
-    obtenerPalabra().then((palabraDelDia) => { 
+    obtenerPalabra().then((palabraDelDia) => {
         palabraDelDia = palabraDelDia.toUpperCase();
         let palabraDelDiaAux = palabraDelDia;
         const letrasPalabra = document.querySelectorAll(`#palabra-${posicion} .letra`);
+        console.log(palabra);
 
         if (palabra === palabraDelDia) {
             ganaste = true;
-            alert('Ganaste!');
+            alert('¡Ganaste!');
             for (let i = 0; i < palabra.length; i++) {
                 letrasPalabra[i].classList.add('acierto');
             }
-        } 
-        for (let i = 0; i < palabra.length; i++) {
-            console.log('Letra ingresada ' + palabra[i], 'Letra correcta ' + palabraDelDia[i])
-            if (palabra[i] === palabraDelDia[i]) {
-                letrasPalabra[i].classList.add('acierto');
-                palabraDelDiaAux -= palabra[i];
-                console.log('acierto');
-            } else if (palabraDelDiaAux.includes(palabra[i])){
-                letrasPalabra[i].classList.add('casiAcierto');
-            } else {
-                letrasPalabra[i].classList.add('fallo');
+        } else {
+            for (let i = 0; i < palabra.length; i++) {
+                console.log('Letra ingresada ' + palabra[i], 'Letra correcta ' + palabraDelDia[i]);
+
+                if (palabra[i] === palabraDelDia[i]) {
+                    letrasPalabra[i].classList.add('acierto');
+                    palabraDelDiaAux = palabraDelDiaAux.replace(palabra[i], ''); // Remover letra correcta
+                    console.log('acierto');
+                } else if (palabraDelDia.includes(palabra[i])) {
+                    letrasPalabra[i].classList.add('casiAcierto');
+                    palabraCorrecta = false;
+                } else {
+                    letrasPalabra[i].classList.add('fallo');
+                    palabraCorrecta = false;
+                }
             }
         }
     });
 }
+
 
 
 function borrarUltimo() {
